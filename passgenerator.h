@@ -21,9 +21,7 @@ private:
 
 private slots:
     void    generatePassword    ();
-    void    sbChanged           (int);
-    void    slChanged           (int);
-    void    pbGenerate          ();
+    void    lengthChanged       (int length);
     void    pbCopy              ();
 };
 

@@ -4,7 +4,6 @@
 #include <QTime>
 #include <QSpinBox>
 #include <QSlider>
-#include <QDebug>
 
 
 
@@ -32,11 +31,11 @@ PassGenerator::PassGenerator(QWidget *parent) :
     connect(ui->cbSymbols,  &QCheckBox      ::clicked,
             this,           &PassGenerator  ::generatePassword);
     connect(ui->sbLength,   SIGNAL(valueChanged(int)),
-            this,           SLOT(sbChanged(int)));
+            this,           SLOT(lengthChanged(int)));
     connect(ui->slLength,   &QSlider        ::valueChanged,
-            this,           &PassGenerator  ::slChanged );
+            this,           &PassGenerator  ::lengthChanged );
     connect(ui->pbGenerate, &QPushButton    ::pressed,
-            this,           &PassGenerator  ::pbGenerate);
+            this,           &PassGenerator  ::generatePassword);
     connect(ui->pbCopy,     &QPushButton    ::pressed,
             this,           &PassGenerator  ::pbCopy    );
 
@@ -47,34 +46,26 @@ PassGenerator::PassGenerator(QWidget *parent) :
 
 
 //======================================= Деструктор
-PassGenerator::~PassGenerator()
-{
-    delete ui;
-}
-
+PassGenerator::~PassGenerator() {delete ui;}
 
 
 
 //======================================= Функция генерирования нового пароля
 void PassGenerator::generatePassword()
 {
-    QString source {""};
+    QString alphabet {""};
 
-    if (ui->cbDigit->isChecked())
-        source.append(digitsS);
-    if (ui->cbLetters->isChecked())
-        source.append(lettersS);
-    if (ui->cbLETTERS->isChecked())
-        source.append(LETTERSS);
-    if (ui->cbSymbols->isChecked())
-        source.append(symbolsS);
+    if (ui->cbDigit->isChecked())   alphabet.append(digitsS);
+    if (ui->cbLetters->isChecked()) alphabet.append(lettersS);
+    if (ui->cbLETTERS->isChecked()) alphabet.append(LETTERSS);
+    if (ui->cbSymbols->isChecked()) alphabet.append(symbolsS);
 
-    if (source == "") return;
+    if (alphabet == "") return;
 
     QString password;
 
-    for (int i {0}, m {source.size()}; i < ui->sbLength->value(); i++)
-        password.append(source.at(qrand() % m));
+    for (int i {ui->sbLength->value()}, alphabetSize {alphabet.size()}; --i >= 0;)
+        password.append(alphabet.at(qrand() % alphabetSize));
 
     ui->lePassword->setText(password);
 }
@@ -82,33 +73,10 @@ void PassGenerator::generatePassword()
 
 
 
-//======================================= Изменение спина длины пароля
-void PassGenerator::sbChanged(int value_)
+//======================================= Изменение длины пароля
+void PassGenerator::lengthChanged(int length)
 {
-    if (ui->slLength->value() != value_) {
-        ui->slLength->setValue(value_);
-        generatePassword();
-    }
-}
-
-
-
-
-//======================================= Изменение слайдера длины пароля
-void PassGenerator::slChanged(int value_)
-{
-    if (ui->sbLength->value() != value_) {
-        ui->sbLength->setValue(value_);
-    }
-    generatePassword();
-}
-
-
-
-
-//======================================= Кнопка генерации нового пароля
-void PassGenerator::pbGenerate()
-{
+    (ui->slLength->value() == length) ? ui->sbLength->setValue(length) : ui->slLength->setValue(length);
     generatePassword();
 }
 
